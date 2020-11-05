@@ -25,7 +25,7 @@ public class BotListaDellaSpesa extends Bot {
     public void textMessage(Message message) {
         MessageToSend mts = null;
         ArrayList<ElementoLista> listaSpesaUtente;
-        Long idUtente = message.getChat().getId();
+        Long idUtente = message.getFrom().getId();
         StatoUtenteBot statoUtente = (statoUtenti.get(message.getFrom().getId()) == null) ? StatoUtenteBot.COMANDO : statoUtenti.get(message.getFrom().getId());
         String testoInputUtente = message.getText();
         
