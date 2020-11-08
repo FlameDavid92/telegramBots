@@ -6,6 +6,7 @@ import java.util.Scanner;
 
 import botBase.BotBase;
 import botListaDellaSpesa.BotListaDellaSpesa;
+import botMorraCinese.BotMorraCinese;
 import botQuestionari.BotQuestionari;
 import botRandomMedia.BotRandomMedia;
 import com.botticelli.bot.Bot;
@@ -32,7 +33,8 @@ public class Main {
         //Bot bot = new BotBase(token);
         //Bot bot = new BotRandomMedia(token);
         //Bot bot = new BotListaDellaSpesa(token);
-        Bot bot = new BotQuestionari(token);
+        //Bot bot = new BotQuestionari(token);
+        Bot bot = new BotMorraCinese(token);
 
         MessageReceiver mr = new MessageReceiver(bot, 500, 1);
         mr.ignoreEditedMessages();
