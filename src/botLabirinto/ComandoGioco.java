@@ -1,10 +1,11 @@
-package botMorraCinese;
+package botLabirinto;
 
 public enum ComandoGioco {
-    AVVIA("Avvia Gioco"), AVVIASPECIAL("Avvia Special"), AVVIAEVIL("Avvia Evil"), BENVENUTO("BENVENUTO");
+    SU("SU"), DESTRA("DESTRA"), GIU("GIÙ"), SINISTRA("SINISTRA"), TERMINA("TERMINA"), ERRORE("ERRORE");
 
     String comando;
-    private ComandoGioco(String comando){
+
+    private ComandoGioco(String comando) {
         this.comando = comando;
     }
 
@@ -16,6 +17,6 @@ public enum ComandoGioco {
                 }
             }
         }
-        return ComandoGioco.BENVENUTO;
+        return ComandoGioco.ERRORE;
     }
 }
