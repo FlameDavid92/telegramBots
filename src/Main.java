@@ -5,6 +5,7 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 
 import botBase.BotBase;
+import botLabirinto.BotLabirinto;
 import botListaDellaSpesa.BotListaDellaSpesa;
 import botMorraCinese.BotMorraCinese;
 import botQuestionari.BotQuestionari;
@@ -34,7 +35,8 @@ public class Main {
         //Bot bot = new BotRandomMedia(token);
         //Bot bot = new BotListaDellaSpesa(token);
         //Bot bot = new BotQuestionari(token);
-        Bot bot = new BotMorraCinese(token);
+        //Bot bot = new BotMorraCinese(token);
+        Bot bot = new BotLabirinto(token);
 
         MessageReceiver mr = new MessageReceiver(bot, 500, 1);
         mr.ignoreEditedMessages();
