@@ -7,6 +7,6 @@ public class Giocatore extends EntitaVivente{
     }
     @Override
     public String toString(){
-        return "〠";
+        return "♔";
     }
 }

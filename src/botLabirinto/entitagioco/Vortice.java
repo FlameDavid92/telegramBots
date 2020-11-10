@@ -6,6 +6,6 @@ public class Vortice extends EntitaLabirinto{
     }
     @Override
     public String toString(){
-        return "Ⓞ";
+        return "▣";
     }
 }

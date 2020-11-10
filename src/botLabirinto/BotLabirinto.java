@@ -10,11 +10,15 @@ import java.util.*;
 public class BotLabirinto extends Bot {
     Map<Long, StatoGiocoLabirinto> statoUtenti;
     EntitaLabirinto[][] labirinto1;
+    Uscita uscitaLabirinto1;
 
 
     public BotLabirinto(String token) {
         super(token);
         labirinto1 = getLabirinto1();
+        uscitaLabirinto1 = new Uscita(5, 9);
+        labirinto1[uscitaLabirinto1.getPosX()][uscitaLabirinto1.getPosY()] = uscitaLabirinto1;
+
         statoUtenti = new HashMap<>();
     }
 
@@ -27,18 +31,41 @@ public class BotLabirinto extends Bot {
             StatoGiocoLabirinto statoUtente = statoUtenti.get(idUtente);
             if (statoUtente.isInGame()) {
                 ComandoGioco cg = ComandoGioco.fromString(inputUtente);
-                switch (cg){
+                EntitaLabirinto[][] labirinto = statoUtente.getLabirinto();
+                Giocatore giocatore = statoUtente.getGiocatore();
+                Mostro mostro = statoUtente.getMostro();
+                switch (cg) {
                     case SU:
-                        messageToSend = new MessageToSend(idUtente, "SU");
+                        if (labirinto[giocatore.getPosX() - 1][giocatore.getPosY()] instanceof Muro) {
+                            messageToSend = new MessageToSend(idUtente, "Non puoi muoverti su un muro!");
+                        } else {
+                            giocatore.posXminus();
+                            messageToSend = new MessageToSend(idUtente, getStringLabirinto(labirinto, giocatore, mostro));
+                        }
                         break;
                     case DESTRA:
-                        messageToSend = new MessageToSend(idUtente, "DESTRA");
+                        if (labirinto[giocatore.getPosX()][giocatore.getPosY() + 1] instanceof Muro) {
+                            messageToSend = new MessageToSend(idUtente, "Non puoi muoverti su un muro!");
+                        } else {
+                            giocatore.posYplus();
+                            messageToSend = new MessageToSend(idUtente, getStringLabirinto(labirinto, giocatore, mostro));
+                        }
                         break;
                     case GIU:
-                        messageToSend = new MessageToSend(idUtente, "GIÙ");
+                        if (labirinto[giocatore.getPosX() + 1][giocatore.getPosY()] instanceof Muro) {
+                            messageToSend = new MessageToSend(idUtente, "Non puoi muoverti su un muro!");
+                        } else {
+                            giocatore.posXplus();
+                            messageToSend = new MessageToSend(idUtente, getStringLabirinto(labirinto, giocatore, mostro));
+                        }
                         break;
                     case SINISTRA:
-                        messageToSend = new MessageToSend(idUtente, "SINISTRA");
+                        if (labirinto[giocatore.getPosX()][giocatore.getPosY() - 1] instanceof Muro) {
+                            messageToSend = new MessageToSend(idUtente, "Non puoi muoverti su un muro!");
+                        } else {
+                            giocatore.posYminus();
+                            messageToSend = new MessageToSend(idUtente, getStringLabirinto(labirinto, giocatore, mostro));
+                        }
                         break;
                     case TERMINA:
                         statoUtente.endGame();
@@ -49,10 +76,19 @@ public class BotLabirinto extends Bot {
                         messageToSend = new MessageToSend(idUtente, "Input non riconosciuto!");
                         messageToSend.setReplyMarkup(getGameKeyboard());
                 }
+
+                if (statoUtente.getUscitaLabirinto().getPosX() == giocatore.getPosX() &&
+                        statoUtente.getUscitaLabirinto().getPosY() == giocatore.getPosY()) {
+                    statoUtente.endGame();
+                    messageToSend = new MessageToSend(idUtente, "Hai vinto!");
+                    messageToSend.setReplyMarkup(getStartKeyboard());
+                }
+
             } else {
                 ComandoBotLabirinto cbl = ComandoBotLabirinto.fromString(inputUtente);
                 switch (cbl) {
                     case LABIRINTO1:
+                        statoUtente.setLabirintoEUscita(labirinto1,uscitaLabirinto1);
                         Giocatore giocatore = statoUtente.getGiocatore();
                         /*Posizione Giocatore per labirinto 1*/
                         giocatore.setPosX(1);
@@ -64,7 +100,7 @@ public class BotLabirinto extends Bot {
                         mostro.setPosY(1);
                         /*************************************/
                         statoUtente.play();
-                        messageToSend = new MessageToSend(idUtente, getStringLabirinto(labirinto1, giocatore, mostro));
+                        messageToSend = new MessageToSend(idUtente, getStringExpl() + getStringLabirinto(labirinto1, giocatore, mostro));
                         messageToSend.setReplyMarkup(getGameKeyboard());
                         /*cambiare stato gioco inGame e presentare tastiera gioco*/
                         break;
@@ -106,15 +142,12 @@ public class BotLabirinto extends Bot {
 
         for (int i = 1; i < dim - 1; i++) {
             for (int j = 1; j < dim - 1; j++) {
-                if (i == 1 && j == 1) {
-                    labirinto[i][j] = new SpazioVuoto(i, j);
-                } else if (i == dim - 2 && j == 1) {
-                    labirinto[i][j] = new SpazioVuoto(i, j);
-                } else if (i == 5 && j == dim - 2) {
+                 /*else if (i == 5 && j == dim - 2) {
                     labirinto[i][j] = new Uscita(i, j);
                 } else if ((i == dim - 2 && j == dim - 2) || (i == 1 && j == dim - 2)) {
                     labirinto[i][j] = new Vortice(i, j);
-                } else if (i % 2 != 0 || j % 2 != 0) {
+                } */
+                if (i % 2 != 0 || j % 2 != 0) {
                     labirinto[i][j] = new SpazioVuoto(i, j);
                 } else {
                     labirinto[i][j] = new Muro(i, j);
@@ -168,6 +201,18 @@ public class BotLabirinto extends Bot {
         ReplyKeyboardMarkupWithButtons replyKeyboard = new ReplyKeyboardMarkupWithButtons(keyboard);
         replyKeyboard.setResizeKeyboard(true);
         return replyKeyboard;
+    }
+
+    private String getStringExpl() {
+        String ret = "";
+        ret += "Tu: ♔\n";
+        ret += "Bot: ♚\n";
+        ret += "Muro: ◆\n";
+        ret += "Spazio: ◇\n";
+        ret += "Vortice: ▣\n";
+        ret += "Uscita: ▩\n";
+        ret += "Raggiungi l'uscita senza farti prendere dal bot!\n\n";
+        return ret;
     }
 
     @Override

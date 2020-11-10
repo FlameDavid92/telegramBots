@@ -6,6 +6,6 @@ public class Uscita extends EntitaLabirinto{
     }
     @Override
     public String toString(){
-        return "↳  ";
+        return "▩";
     }
 }

@@ -6,6 +6,6 @@ public class SpazioVuoto extends EntitaLabirinto{
     }
     @Override
     public String toString(){
-        return "    ";
+        return "◇";
     }
 }

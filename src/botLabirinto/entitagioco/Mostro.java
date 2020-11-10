@@ -7,6 +7,6 @@ public class Mostro extends EntitaVivente{
     }
     @Override
     public String toString(){
-        return "孽";
+        return "♚";
     }
 }

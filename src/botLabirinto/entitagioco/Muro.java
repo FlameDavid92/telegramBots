@@ -6,6 +6,6 @@ public class Muro extends EntitaLabirinto{
     }
     @Override
     public String toString(){
-        return "▉";
+        return "◆";
     }
 }
