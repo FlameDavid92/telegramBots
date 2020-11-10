@@ -80,7 +80,7 @@ public class BotLabirinto extends Bot {
                 if (statoUtente.getUscitaLabirinto().getPosX() == giocatore.getPosX() &&
                         statoUtente.getUscitaLabirinto().getPosY() == giocatore.getPosY()) {
                     statoUtente.endGame();
-                    messageToSend = new MessageToSend(idUtente, "Hai vinto!");
+                    messageToSend = new MessageToSend(idUtente, getStringLabirinto(labirinto,giocatore,mostro)+"\nHai vinto!");
                     messageToSend.setReplyMarkup(getStartKeyboard());
                 }
 
