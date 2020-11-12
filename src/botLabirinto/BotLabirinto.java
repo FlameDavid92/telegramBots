@@ -11,6 +11,7 @@ public class BotLabirinto extends Bot {
     Map<Long, StatoGiocoLabirinto> statoUtenti;
     EntitaLabirinto[][] labirinto1;
     Uscita uscitaLabirinto1;
+    Random rndm;
 
 
     public BotLabirinto(String token) {
@@ -20,6 +21,7 @@ public class BotLabirinto extends Bot {
         labirinto1[uscitaLabirinto1.getPosX()][uscitaLabirinto1.getPosY()] = uscitaLabirinto1;
 
         statoUtenti = new HashMap<>();
+        rndm = new Random();
     }
 
     @Override
@@ -34,6 +36,7 @@ public class BotLabirinto extends Bot {
                 EntitaLabirinto[][] labirinto = statoUtente.getLabirinto();
                 Giocatore giocatore = statoUtente.getGiocatore();
                 Mostro mostro = statoUtente.getMostro();
+                muoviMostro(labirinto, mostro, giocatore, rndm);
                 switch (cg) {
                     case SU:
                         if (labirinto[giocatore.getPosX() - 1][giocatore.getPosY()] instanceof Muro) {
@@ -80,15 +83,18 @@ public class BotLabirinto extends Bot {
                 if (statoUtente.getUscitaLabirinto().getPosX() == giocatore.getPosX() &&
                         statoUtente.getUscitaLabirinto().getPosY() == giocatore.getPosY()) {
                     statoUtente.endGame();
-                    messageToSend = new MessageToSend(idUtente, getStringLabirinto(labirinto,giocatore,mostro)+"\nHai vinto!");
+                    messageToSend = new MessageToSend(idUtente, getStringLabirinto(labirinto, giocatore, mostro) + "\nHai vinto!");
+                    messageToSend.setReplyMarkup(getStartKeyboard());
+                }else if(mostro.getPosX() == giocatore.getPosX() && mostro.getPosY() == giocatore.getPosY()){
+                    statoUtente.endGame();
+                    messageToSend = new MessageToSend(idUtente, getStringLabirinto(labirinto, giocatore, mostro) + "\nHai persooo!");
                     messageToSend.setReplyMarkup(getStartKeyboard());
                 }
-
             } else {
                 ComandoBotLabirinto cbl = ComandoBotLabirinto.fromString(inputUtente);
                 switch (cbl) {
                     case LABIRINTO1:
-                        statoUtente.setLabirintoEUscita(labirinto1,uscitaLabirinto1);
+                        statoUtente.setLabirintoEUscita(labirinto1, uscitaLabirinto1);
                         Giocatore giocatore = statoUtente.getGiocatore();
                         /*Posizione Giocatore per labirinto 1*/
                         giocatore.setPosX(1);
@@ -213,6 +219,41 @@ public class BotLabirinto extends Bot {
         ret += "Uscita: ▩\n";
         ret += "Raggiungi l'uscita senza farti prendere dal bot!\n\n";
         return ret;
+    }
+
+    /*Un mostro non può teletrasportarsi sui vortici!!!*/
+    private void muoviMostro(EntitaLabirinto[][] labirinto, Mostro mostro, Giocatore giocatore, Random rndm) {
+        int posXMostro = mostro.getPosX();
+        int posYMostro = mostro.getPosY();
+        int posXGioc = giocatore.getPosX();
+        int posYGioc = giocatore.getPosY();
+        if (posXMostro > posXGioc && labirinto[posXMostro - 1][posYMostro] instanceof SpazioVuoto) {
+            mostro.posXminus();
+        } else if (posXMostro < posXGioc && labirinto[posXMostro + 1][posYMostro] instanceof SpazioVuoto) {
+            mostro.posXplus();
+        } else if (posYMostro > posYGioc && labirinto[posXMostro][posYMostro - 1] instanceof SpazioVuoto) {
+            mostro.posYminus();
+        } else if (posYMostro < posYGioc && labirinto[posXMostro][posYMostro + 1] instanceof SpazioVuoto) {
+            mostro.posYplus();
+        } else {
+            ArrayList<int[]> ael = new ArrayList<>();
+            if ((posXMostro - 1 >= 0) && labirinto[posXMostro - 1][posYMostro] instanceof SpazioVuoto)
+                ael.add(new int[]{posXMostro - 1, posYMostro});
+            if ((posXMostro + 1 < labirinto.length) && labirinto[posXMostro + 1][posYMostro] instanceof SpazioVuoto)
+                ael.add(new int[]{posXMostro + 1, posYMostro});
+            if ((posYMostro - 1 >= 0) && labirinto[posXMostro][posYMostro - 1] instanceof SpazioVuoto)
+                ael.add(new int[]{posXMostro, posYMostro - 1});
+            if ((posYMostro + 1 < labirinto[0].length) && labirinto[posXMostro][posYMostro + 1] instanceof SpazioVuoto)
+                ael.add(new int[]{posXMostro, posYMostro + 1});
+
+            if (ael.size() > 0) {
+                int choice = rndm.nextInt(ael.size());
+                mostro.setPosX(ael.get(choice)[0]);
+                mostro.setPosY(ael.get(choice)[1]);
+            } else {
+                System.out.println("Che fortuna, il mostro è bloccato!");
+            }
+        }
     }
 
     @Override
